@@ -46,9 +46,24 @@ async def postResults(data: LeaderboardInfo):
         return {"Error:" "Something went wrong."}, 404
 
 
+# top 10 scores endpoint
 @app.route("/top-scores/", methods=["GET"])
 async def topScores():
     """
-    this function is responsible for displaying the top 10 scores found in the database
+    this function is responsible for retrieving the top 10 scores from the database
+
+    @return: 200 if successful, 404 if not found
     """
 
+    leaderboardSet = "Leaderboard"
+
+    topScores = redisClient.zrange(leaderboardSet, 0, 9, desc = True, withscores = True)
+
+    # Does the database have any data?
+    if topScores != None:
+        # If so, retrieve
+        data = dataclasses.asdict(topScores)
+        return data, 200
+    else:
+        # Should equal nil, or None, so return a message
+        return {"Error": "Database empty."}, 404
