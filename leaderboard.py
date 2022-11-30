@@ -14,6 +14,9 @@ QuartSchema(app)
 # Initialize redis client
 redisClient = redis.Redis(host='localhost', port=6379, db=0)
 
+# delete everything in the redis client for testing
+redisClient.flushall()
+
 # Create a data class to assist with API data
 @dataclasses.dataclass
 class LeaderboardInfo:
@@ -35,15 +38,26 @@ async def postResults(data: LeaderboardInfo):
     Potential: May return 401 if data does not match the LeaderboardInfo dataclass template
     """
 
+    # adding data to redis-server
+
+
     # Create sorted set
     leaderboardSet = "Leaderboard"
     leaderboardData = dataclasses.asdict(data)
 
     # Were we able to post?
-    if redisClient.zadd(leaderboardSet, leaderboardData[score], leaderboardData[username]) == 1:
-        return leaderboardData, 200
+    #if redisClient.zadd(leaderboardSet, leaderboardData[score], leaderboardData[username]) == 1:
+    #    return leaderboardData, 200
+    #else:
+    #    return {"Error:" "Something went wrong."}, 404
+    #if result = 1 then dataset that is added is new
+    #if result = 0 then dataset wasn't added because duplicate 
+    result = redisClient.zadd(leaderboardSet, {leaderboardData["username"]: leaderboardData["score"]})
+    print(result)
+    if result == 0:
+        return {"username exist: updating score.": leaderboardData}, 200
     else:
-        return {"Error:" "Something went wrong."}, 404
+        return {"Adding new username and score.": leaderboardData}, 200
 
 
 # top 10 scores endpoint
@@ -56,14 +70,18 @@ async def topScores():
     """
 
     leaderboardSet = "Leaderboard"
+    
+    redisClient.zadd(leaderboardSet, {'user1': 25, 'user2': 11, 'user3': 20, 'user4': 16, 'user5': 19, 'user6': 43, 'user7': 5, 'user8': 37, 'user9': 8, 'user10': 47,
+                                     'user11': 30, 'user12': 1, 'user13': 22, 'user14': 50, 'user15': 35, 'user16': 21, 'user17': 9, 'user18': 27, 'user19': 13, 'user20': 7})
 
     topScores = redisClient.zrange(leaderboardSet, 0, 9, desc = True, withscores = True)
+    print(redisClient.zrange(leaderboardSet, 0, 9, desc = True, withscores = True))
 
     # Does the database have any data?
-    if topScores != None:
+    if topScores != "":
         # If so, retrieve
-        data = dataclasses.asdict(topScores)
-        return data, 200
+        #data = dataclasses.asdict(topScores)
+        return topScores, 200
     else:
         # Should equal nil, or None, so return a message
         return {"Error": "Database empty."}, 404
