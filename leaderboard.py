@@ -4,6 +4,8 @@ import dataclasses
 import textwrap
 import redis
 
+import json
+
 # Necessary quart imports
 from quart import Quart, g, request, abort
 from quart_schema import QuartSchema, RequestSchemaValidationError, validate_request
@@ -15,7 +17,7 @@ QuartSchema(app)
 redisClient = redis.Redis(host='localhost', port=6379, db=0)
 
 # delete everything in the redis client for testing
-redisClient.flushall()
+#redisClient.flushall()
 
 # Create a data class to assist with API data
 @dataclasses.dataclass
@@ -54,10 +56,16 @@ async def postResults(data: LeaderboardInfo):
     #if result = 0 then dataset wasn't added because duplicate 
     result = redisClient.zadd(leaderboardSet, {leaderboardData["username"]: leaderboardData["score"]})
     print(result)
+    resultOne = redisClient.zrange(leaderboardSet, 0, -1, desc = True, withscores = True)
+    print(type(resultOne))
+    print(resultOne)
     if result == 0:
-        return {"username exist: updating score.": leaderboardData}, 200
-    else:
-        return {"Adding new username and score.": leaderboardData}, 200
+        #print(resultOne)
+        #return {"username exist: updating score.": leaderboardData}, 200
+        return str(resultOne)
+    #else:
+        #print(resultOne)
+        #return {"Adding new username and score.": leaderboardData}, 200
 
 
 # top 10 scores endpoint
