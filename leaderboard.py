@@ -40,13 +40,15 @@ async def postResults(data: LeaderboardInfo):
     # Create sorted set
     leaderboardSet = "Leaderboard"
     leaderboardData = dataclasses.asdict(data)
-    
+
+    # *** Debug section ***
     #if result = 1 then dataset that is added is new
-    #if result = 0 then dataset wasn't added because duplicate 
-    result = redisClient.zadd(leaderboardData, {leaderboardData["username"]: leaderboardData["score"]})
+    #if result = 0 then dataset wasn't added because duplicate
     #print(result) used to see output
     #resultOne = redisClient.zrange(leaderboardSet, 0, -1, desc = True, withscores = True, score_cast_func=int)
-    #print(resultOne) #used to see ouput
+    #print(resultOne) used to see ouput
+
+    result = redisClient.zadd(leaderboardData, {leaderboardData["username"]: leaderboardData["score"]})
     if result == 0:
         return "Username exist -- Updating Score.\nGame Status-Score\n" + ('\n'.join(map(str, resultOne))), 200
     elif result != int:
@@ -66,9 +68,8 @@ async def topScores():
 
     leaderboardSet = "Leaderboard"
 
-
     topScores = redisClient.zrange(leaderboardSet, 0, 9, desc = True, withscores = True)
-    print(redisClient.zrange(leaderboardSet, 0, 9, desc = True, withscores = True))
+    #print(redisClient.zrange(leaderboardSet, 0, 9, desc = True, withscores = True))
 
     # Does the database have any data?
     if topScores != None:
