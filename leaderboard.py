@@ -45,7 +45,7 @@ async def postResults(data: LeaderboardInfo):
     
     #if result = 1 then dataset that is added is new
     #if result = 0 then dataset wasn't added because duplicate 
-    result = redisClient.zadd(leaderboardData, {leaderboardData["username"]: leaderboardData["score"]})
+    result = redisClient.zadd(leaderboardSet, {leaderboardData["username"]: leaderboardData["score"]})
     print(result) #used to see output
     resultOne = redisClient.zrange(leaderboardSet, 0, -1, desc = True, withscores = True, score_cast_func=int)
     print(resultOne) #used to see ouput
