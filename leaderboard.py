@@ -59,7 +59,7 @@ async def postResults(data: LeaderboardInfo):
 
 # top 10 scores endpoint
 @app.route("/top-scores/", methods=["GET"])
-async def topScores(data: LeaderboardInfo):
+async def topScores():
     """
     this function is responsible for retrieving the top 10 scores from the database
 
