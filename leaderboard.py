@@ -15,7 +15,7 @@ from quart_schema import QuartSchema, RequestSchemaValidationError, validate_req
 app = Quart(__name__)
 QuartSchema(app)
 
-app.config.form_file(f"./etc/game.toml", toml.load)
+app.config.form_file(f"./etc/{__name_}.toml", toml.load)
 
 async def _connect_db():
     database = databses.Databse(app.config["DATABASES"]["URL"])
