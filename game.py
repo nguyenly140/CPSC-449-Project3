@@ -52,9 +52,7 @@ async def _connect_replica_db():
     elif(random_db == 1):
         database = databases.Database(app.config["DATABASES"]["URLONE"])
     else:
-
-    database = databases.Database(app.config["DATABASES"][next(nextDb)])
-
+        database = databases.Database(app.config["DATABASES"]["URLTWO"])
     app.logger.info(database)
     await database.connect()
     return database
