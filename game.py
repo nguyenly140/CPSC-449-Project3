@@ -94,7 +94,7 @@ def index():
 # @validate_request(Game)
 async def create_game():
     auth = request.authorization
-    db = await _get_replica_db()
+    db = await _get_db()
     # username = dataclasses.asdict(data)
     if auth["username"]:
         # Retrive random ID from the answers table
