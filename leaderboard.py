@@ -4,28 +4,12 @@ import dataclasses
 import textwrap
 import redis
 
-import databases
-import sqlite3
-import toml
-
 # Necessary quart imports
 from quart import Quart, g, request, abort
 from quart_schema import QuartSchema, RequestSchemaValidationError, validate_request
 
 app = Quart(__name__)
 QuartSchema(app)
-
-app.config.form_file(f"./etc/{__name_}.toml", toml.load)
-
-async def _connect_db():
-    database = databses.Databse(app.config["DATABASES"]["URL"])
-    await database.conntect()
-    return database
-
-def _get_db():
-    if not hasattr(g, "sqlite_db"):
-        g.sqlite_db = connect_db()
-    return g.sqlite_db
 
 # Initialize redis client
 redisClient = redis.StrictRedis(host='localhost', port=6379, db=0, charset='utf-8', decode_responses=True)
