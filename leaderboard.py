@@ -36,8 +36,6 @@ async def postResults(data: LeaderboardInfo):
     @return: 200 if successful
     Potential: May return 401 if data does not match the LeaderboardInfo dataclass template
     """
-    redisClient.zadd(leaderboardSet, {'user1': 25, 'user2': 11, 'user3': 20, 'user4': 16, 'user5': 19, 'user6': 43, 'user7': 5, 'user8': 37, 'user9': 8, 'user10': 47,
-                                     'user11': 30, 'user12': 1, 'user13': 22, 'user14': 50, 'user15': 35, 'user16': 21, 'user17': 9, 'user18': 27, 'user19': 13, 'user20': 7})
 
     # Create sorted set
     leaderboardSet = "Leaderboard"
@@ -45,10 +43,10 @@ async def postResults(data: LeaderboardInfo):
     
     #if result = 1 then dataset that is added is new
     #if result = 0 then dataset wasn't added because duplicate 
-    result = redisClient.zadd(leaderboardSet, {leaderboardData["username"]: leaderboardData["score"]})
-    print(result) #used to see output
-    resultOne = redisClient.zrange(leaderboardSet, 0, -1, desc = True, withscores = True, score_cast_func=int)
-    print(resultOne) #used to see ouput
+    result = redisClient.zadd(leaderboardData, {leaderboardData["username"]: leaderboardData["score"]})
+    #print(result) used to see output
+    #resultOne = redisClient.zrange(leaderboardSet, 0, -1, desc = True, withscores = True, score_cast_func=int)
+    #print(resultOne) #used to see ouput
     if result == 0:
         return "Username exist -- Updating Score.\nGame Status-Score\n" + ('\n'.join(map(str, resultOne))), 200
     elif result != int:
@@ -67,7 +65,7 @@ async def topScores():
     """
 
     leaderboardSet = "Leaderboard"
-    
+
 
     topScores = redisClient.zrange(leaderboardSet, 0, 9, desc = True, withscores = True)
     print(redisClient.zrange(leaderboardSet, 0, 9, desc = True, withscores = True))
