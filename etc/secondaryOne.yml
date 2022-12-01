@@ -2,6 +2,8 @@ mount-dir: 'var/secondaryOne/mount'
 
 data-dir: 'var/secondaryOne/data'
 
+exec: hypercorn game --reload --debug --bind game.local.gd:$PORT --access-logfile - --error-logfile - --log-level DEBUG
+
 http:
   # Specifies the bind address of the HTTP API server.
   addr: ":20203"

@@ -8,6 +8,8 @@ import sqlite3
 import textwrap
 import uuid
 
+import itertools
+
 import random
 
 import databases
@@ -47,14 +49,18 @@ async def _connect_db():
 async def _connect_replica_db():
     random_db = random.randint(0, 2)
 
+    nextDb = itertools.cycle(["URL", "URLONE", "URLTWO"])
+    """
     if(random_db == 0):
         database = databases.Database(app.config["DATABASES"]["URL"])
     elif(random_db == 1):
         database = databases.Database(app.config["DATABASES"]["URLONE"])
     else:
         database = databases.Database(app.config["DATABASES"]["URLTWO"])
+    """
+    database = databases.Database(app.config["DATABASES"][next(nextDb)])
 
-    app.logger.info(random_db)
+    app.logger.info(database)
     await database.connect()
     return database
 
@@ -93,7 +99,7 @@ def index():
 # @validate_request(Game)
 async def create_game():
     auth = request.authorization
-    db = await _get_db()
+    db = await _get_replica_db()
     # username = dataclasses.asdict(data)
     if auth["username"]:
         # Retrive random ID from the answers table
