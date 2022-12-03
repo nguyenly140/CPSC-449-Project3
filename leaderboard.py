@@ -12,10 +12,7 @@ app = Quart(__name__)
 QuartSchema(app)
 
 # Initialize redis client
-redisClient = redis.StrictRedis(host='localhost', port=6379, db=0, charset='utf-8', decode_responses=True)
-
-# delete everything in the redis client for testing
-#redisClient.flushall()
+redisClient = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
 # Create a data class to assist with API data
 @dataclasses.dataclass
@@ -32,7 +29,6 @@ async def postResults(data: LeaderboardInfo):
     """
     This function is responsible for posting the results of a game
     As it is not yet tied to the actual game, it currently takes in any values
-
     @return: 200 if successful
     Potential: May return 401 if data does not match the LeaderboardInfo dataclass template
     """
@@ -41,41 +37,41 @@ async def postResults(data: LeaderboardInfo):
     leaderboardSet = "Leaderboard"
     leaderboardData = dataclasses.asdict(data)
 
-    # *** Debug section ***
-    #if result = 1 then dataset that is added is new
-    #if result = 0 then dataset wasn't added because duplicate
-    #print(result) used to see output
-    #resultOne = redisClient.zrange(leaderboardSet, 0, -1, desc = True, withscores = True, score_cast_func=int)
-    #print(resultOne) used to see ouput
+    # Initializing redis with members and values
+    #redisClient.zadd(leaderboardSet, {'Won in 1 guess': 25, 'Won in 2 guesses': 11, 'Won in 3 guesses': 20, 'Won in 4 guesses': 16, 'Won in 5 guesses': 19, 'Won in 6 guesses': 43, 'Lost': 10})
 
-    result = redisClient.zadd(leaderboardData, {leaderboardData["username"]: leaderboardData["score"]})
-    if result == 0:
-        return "Username exist -- Updating Score.\nGame Status-Score\n" + ('\n'.join(map(str, resultOne))), 200
+    #if result = 1 then dataset that is added is new
+    #if result = 0 then dataset wasn't added because duplicate 
+    result = redisClient.zadd(leaderboardSet, {leaderboardData["username"]: leaderboardData["score"]})
+    #resultOne = redisClient.zrange(leaderboardSet, 0, -1, desc = True, withscores = True, score_cast_func=int)
+
+    if result == 1:
+        return {leaderboardData["username"]: leaderboardData["score"]}, 200
+    elif result == 0:
+        return {leaderboardData["username"]: leaderboardData["score"]}, 200
     elif result != int:
         return {"Error:" "Something went wrong."}, 404
     else:
-        return "Adding new username and score.\nGame Status-Score\n" + ('\n'.join(map(str, resultOne))), 200
+        return {"Error": "Unknown error."}, 409
 
 
-# top 10 scores endpoint
+# Top 10 scores endpoint
 @app.route("/top-scores/", methods=["GET"])
 async def topScores():
     """
     this function is responsible for retrieving the top 10 scores from the database
-
     @return: 200 if successful, 404 if not found
     """
 
     leaderboardSet = "Leaderboard"
 
-    topScores = redisClient.zrange(leaderboardSet, 0, 9, desc = True, withscores = True)
-    #print(redisClient.zrange(leaderboardSet, 0, 9, desc = True, withscores = True))
+    topScores = redisClient.zrange(leaderboardSet, 0, 9, desc=True, withscores=True)
 
     # Does the database have any data?
     if topScores != None:
         # If so, retrieve
         #data = dataclasses.asdict(topScores)
-        return ('\n'.join(map(str, topScores))), 200
+        return dict(topScores), 200
     else:
         # Should equal nil, or None, so return a message
         return {"Error": "Database empty."}, 404
