@@ -1,28 +1,26 @@
-# Wordle Backend Project1 : API Endpoints
+# Wordle Backend Project3 : API Endpoints
 
-Group 4 team members:
+Group 11 team members:
 Florentino Becerra,
-Himani Tawade,
 Kevin Delgado,
-Mohamed Habarneh
+Ly Nguyen,
+Steven Rico
 
 Steps to run the project:
 
-1. Initialize the database and start the API:
+1. Start the API by running
+
+   foreman start
+   
+2. Then initialize the database and after starting the API:
 
    ./bin/init.sh
 
-2. Populate the data base by running the python script:
+3. Go to local.gd docs to view and test all the endpoints
 
-   dbpop.py
-
-3. Start the API by running
-
-   foreman start
-
-4. Go to local.gd docs to view and test all the endpoints
-
-   http://wordle.local.gd:5000/docs
+   http://tuffix-vm:5000/docs
+   http://leaderboard.local.gd:5100/docs
+   http://game.local.gd:5200/docs
 
 
 
